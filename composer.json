@@ -1,0 +1,33 @@
+{
+    "name": "tingyu/weixin_transfer",
+    "description": "微信转账，包含企业付款到零钱 v1，商家转账到零钱（批量转账场景）v2，商家转账到零钱（用户确认场景）v3",
+    "type": "library",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "tingyu",
+            "email": "qiuyix@sina.cn"
+        }
+    ],
+    "minimum-stability": "dev",
+    "extra":{
+        "branch-alias":{
+            "dev-develop":"dev"
+        }
+    },
+    "require": {
+        "php": ">=7.0",
+        "ext-curl": "*",
+        "ext-json": "*",
+        "tingyu/http_request": "v0.0.4",
+        "ext-openssl": "*"
+    },
+    "autoload": {
+        "psr-4": {
+            "tingyu\\WeixinTransfer\\": "src/"
+        },
+        "files": [
+            "src/common.php"
+        ]
+    }
+}
