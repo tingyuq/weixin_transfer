@@ -20,7 +20,9 @@
         "ext-curl": "*",
         "ext-json": "*",
         "tingyu/http_request": "v0.0.4",
-        "ext-openssl": "*"
+        "ext-openssl": "*",
+        "ext-mbstring": "*",
+        "ext-simplexml": "*"
     },
     "autoload": {
         "psr-4": {

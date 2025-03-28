@@ -4,9 +4,11 @@ namespace tingyu\WeixinTransfer\v1;
 
 use tingyu\HttpRequest\HttpClient;
 
-class Base
+abstract class Base
 {
     protected $appid;
+
+    protected $appSecret;
 
     protected $mchId;
 
@@ -72,9 +74,10 @@ class Base
      * @param string $paySerial  证书系列号
      * @param string $apiClientKeyFile api私钥文件路径， 或文件内容  //todo 待校验，看文本内容是否可以
     */
-    public function __construct($appid, $mchId, $serialNo, $apiClientKeyContent)
+    public function __construct($appid, $appSecret, $mchId, $serialNo, $apiClientKeyContent)
     {
         $this->appid = $appid;
+        $this->appSecret = $appSecret;
         $this->mchId = $mchId;
         $this->serialNo = $serialNo;
         $this->apiClientKeyContent = $apiClientKeyContent;
@@ -86,51 +89,48 @@ class Base
      * @param string $method
      * @param string $uri
      * @param string $data
-     * @return string
      */
-    protected function getAuthStr($method, $uri,  $data)
+    private function sign(&$data)
     {
         $time = time();
         $nonce = general_nonce_string(32);
+        $data['nonce_str'] = $nonce;
 
-
-    $str = <<<EOL
-$method
-$uri
-$time
-$nonce
-$data
-
-EOL;
-
-        $privateKey = openssl_pkey_get_private($this->apiClientKeyContent);
-        if ($privateKey === false) {
-            throw new \Exception('无法从PEM字符串中获取私钥信息');
+        ksort($data);
+        $str = '';
+        foreach ($data as $key => $value) {
+            $str .= "{$key}={$value}&";
         }
+        $str .= "key={$this->appSecret}";
+        $data['sign'] = md5($str);
+    }
 
-        $bool = openssl_sign($str, $signature,$privateKey, OPENSSL_ALGO_SHA256);
-        if (!$bool) {
-            throw new \Exception('验签错误');
+    private function arrayToXml($data){
+        $str='<xml>';
+        foreach($data as $k=>$v) {
+            $str.='<'.$k.'>'.$v.'</'.$k.'>';
         }
+        $str.='</xml>';
+        return $str;
+    }
 
-        $base64Signature = base64_encode($signature);
-
-        return sprintf('WECHATPAY2-SHA256-RSA2048 mchid="%s",nonce_str="%s",signature="%s",timestamp="%d",serial_no="%s"', $this->mchId, $nonce, $base64Signature, $time, $this->serialNo);
+    private function xmlToArray($xml) {
+        $xmlObj = simplexml_load_string($xml, 'SimpleXMLElement', LIBXML_NOCDATA);
+        $arr = json_decode(json_encode($xmlObj),true);
+        return $arr;
     }
 
 
     protected function execRequest(HttpClient $http, $uri, $data) {
 
         $url = $this->domain. $uri;
-        $className = explode('\\', strtoupper(get_class($http)));
 
-        $auth = $this->getAuthStr($className[3], $uri, $data);
+        $this->sign($data);
+        $xml = $this->arrayToXml($data);
 
-        $response = $http->setHeader('Authorization', $auth)
-            ->setHeader('Accept', 'application/json')
-            ->setHeader('Content-Type', 'application/json')
-            ->setHeader('Wechatpay-Serial', $this->serialNo)
-            ->do($url, $data);
+        // todo 需要证书
+        $http->setCertificate('','');
+        $response = $http->do($url, $xml);
 
         if ($http->getErrNo() != 0) {
             throw new \Exception($http->getErrMsg(), $http->getErrNo());
@@ -140,17 +140,10 @@ EOL;
             throw new \Exception("请求未响应");
         }
 
-        $json = json_decode($response, true);
-        if (json_last_error() != JSON_ERROR_NONE) {
-            throw new \Exception(json_last_error_msg(), json_last_error());
-        }
-
-        if (array_key_exists('code', $json)) {
-            $message = array_key_exists('message', $json) ? $json['message'] : '请求报错了，微信未返回报错信息';
-
-            throw new \Exception($message);
-        }
+        $json = $this->xmlToArray($response);
 
         return $json;
     }
+
+    abstract function Exec();
 }
