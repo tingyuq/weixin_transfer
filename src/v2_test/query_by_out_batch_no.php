@@ -4,7 +4,7 @@ require_once dirname(__DIR__) . "/../vendor/autoload.php";
 require_once 'config.php';
 
 $apiClientKeyFile = file_get_contents('apiclient_test_key.pem');
-
+$wechatplatfrom = file_get_contents('wechat_platfrom.pem');
 
 $info = [
     [
@@ -18,7 +18,7 @@ $info = [
 ];
 
 
-$transfer = new \tingyu\WeixinTransfer\v2\OutBatchNoQuery($conf['appid'], $conf['mchid'], $conf['api_key_v3'], $conf['paySerial'], $apiClientKeyFile);
+$transfer = new \tingyu\WeixinTransfer\v2\OutBatchNoQuery($conf['appid'], $conf['mchid'], $conf['api_key_v3'],  $conf['paySerial'], $apiClientKeyFile, $conf['wechat_serial_no'], $wechatplatfrom);
 
-$data = $transfer->Exec('batch1002', true, 'ALL');
+$data = $transfer->Exec('batch1005', true, 'ALL');
 echo json_encode($data,JSON_PRETTY_PRINT|JSON_UNESCAPED_UNICODE);

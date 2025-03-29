@@ -37,7 +37,16 @@ class Apply extends Base
         'PAYMENT_IN_PROGRESS' => '该笔付款正在处理中',
     ];
 
-    public function Exec($tradeNo, $openid, $username, $amount, $desc)
+    /**
+     * @param string $tradeNo 商家转账单号
+     * @param float $amount 转账金额（元）
+     * @param string $openid 用户在商户appid下的唯一标识
+     * @param string $username 收款方真实姓名，
+     * @param string $desc 转账备注
+     * @return mixed
+     * @throws \Exception
+     */
+    public function Exec($tradeNo, $amount, $openid, $username, $desc)
     {
         if (!preg_match('/^[A-Za-z0-9]{8,32}$/', $tradeNo)) {
             throw new \Exception('商互订单号由长度为8到32位的大小写字母数字组成');
@@ -46,7 +55,11 @@ class Apply extends Base
         if (!preg_match('/^(0|[1-9]\d*)(\.\d{1,2})?$/', $amount)) {
             throw new \Exception('转账金额不合法');
         }
-        $amount = $amount * 100;
+
+        $amount = intval($amount * 100);
+        if ($amount < 30) {
+            throw new \Exception('转账金额最小为 0.3 元');
+        }
 
         if (empty($desc) || mb_strlen($desc) > 100) {
             throw new \Exception('付款备注不能为空，或者大于100字符');

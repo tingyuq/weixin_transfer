@@ -8,7 +8,7 @@ abstract class Base
 {
     protected $appid;
 
-    protected $appKey;
+    protected $appsecret;
 
     protected $mchId;
 
@@ -17,7 +17,6 @@ abstract class Base
     protected $apiClientCertFile;
 
     protected $domain = 'https://api.mch.weixin.qq.com';
-
 
     protected $state = [
         'ACCEPTED'=>'转账已受理',
@@ -70,15 +69,16 @@ abstract class Base
     ];
 
     /**
-     * @param string $appid 应用appid
-     * @param string $mchId 商户号id
-     * @param string $paySerial  证书系列号
-     * @param string $apiClientKeyFile api私钥文件路径， 或文件内容  //todo 待校验，看文本内容是否可以
-    */
-    public function __construct($appid, $appKey, $mchId, $apiClientCertFile, $apiClientKeyCertFile)
+     * @param string $appid 小程序标识(APPID)
+     * @param string $appsecret 小程序APPSECRE
+     * @param string $mchId 微信支付商户号(MCHID)
+     * @param string $apiClientCertFile 支付证书(apiclient_cert) 文件路径
+     * @param string $apiClientKeyCertFile 支付证书密钥(apiclient_key) 文件路径
+     */
+    public function __construct($appid, $appsecret, $mchId, $apiClientCertFile, $apiClientKeyCertFile)
     {
         $this->appid = $appid;
-        $this->appKey = $appKey;
+        $this->appsecret = $appsecret;
         $this->mchId = $mchId;
         $this->apiClientCertFile = $apiClientCertFile;
         $this->apiClientKeyCertFile = $apiClientKeyCertFile;
@@ -103,7 +103,7 @@ abstract class Base
         foreach ($data as $key => $value) {
             $str .= "{$key}={$value}&";
         }
-        $str .= "key={$this->appKey}";
+        $str .= "key={$this->appsecret}";
         $data['sign'] = md5($str);
     }
 
@@ -145,6 +145,4 @@ abstract class Base
 
         return $json;
     }
-
-//    abstract function Exec();
 }

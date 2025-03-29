@@ -1,2 +1,4 @@
 apiclient_test_key.pem
 config.php
+
+*.pem

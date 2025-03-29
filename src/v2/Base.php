@@ -6,17 +6,43 @@ use tingyu\HttpRequest\HttpClient;
 
 abstract class Base
 {
+    /**
+     * @var string 小程序标识 appid
+     */
     protected $appid;
 
+    /**
+     * @var string 微信支付商户号
+     */
     protected $mchId;
 
-    protected $apiClientKeyContent;
-
+    /**
+     * @var string 微信支付 apiv3 密钥
+     */
     protected $appKeyV3;
 
-    protected $domain = 'https://api.mch.weixin.qq.com';
+    /**
+     * @var string 支付证书密钥 内容，非文件路径
+     */
+    protected $apiClientKeyContent;
 
+    /**
+     * @var string 微信平台证书内容，非文件路径
+     * @desc 获取微信证书参考地址：https://pay.weixin.qq.com/doc/v3/merchant/4012068814
+     */
+    protected $wechatCertContent;
+
+    /**
+     * @var string 微信平台证书系列号
+     */
+    protected $wechatSerialNo;
+
+    /**
+     * @var string 支付证书系列号
+     */
     protected $serialNo;
+
+    protected $domain = 'https://api.mch.weixin.qq.com';
 
     protected $state = [
         'ACCEPTED'=>'转账已受理',
@@ -71,16 +97,21 @@ abstract class Base
     /**
      * @param string $appid 应用appid
      * @param string $mchId 商户号id
-     * @param string $paySerial  证书系列号
-     * @param string $apiClientKeyFile api私钥文件路径， 或文件内容  //todo 待校验，看文本内容是否可以
-    */
-    public function __construct($appid, $mchId, $appKeyV3, $serialNo, $apiClientKeyContent)
+     * @param string $serialNo  证书系列号
+     * @param string $apiClientKeyContent 支付证书密钥文件内容
+     * @param string $wechatSerialNo 平台证书序列号
+     * @param string $wechatCertContent 平台证书文件内容
+     */
+    public function __construct($appid, $mchId, $appKeyV3, $serialNo, $apiClientKeyContent, $wechatSerialNo, $wechatCertContent)
     {
         $this->appid = $appid;
         $this->mchId = $mchId;
         $this->appKeyV3 = $appKeyV3;
         $this->serialNo = $serialNo;
         $this->apiClientKeyContent = $apiClientKeyContent;
+        $this->wechatSerialNo = $wechatSerialNo;
+        $this->wechatCertContent = $wechatCertContent;
+
     }
 
 
@@ -132,7 +163,7 @@ EOL;
         $response = $http->setHeader('Authorization', $auth)
             ->setHeader('Accept', 'application/json')
             ->setHeader('Content-Type', 'application/json')
-            ->setHeader('Wechatpay-Serial', $this->serialNo)
+            ->setHeader('Wechatpay-Serial', $this->wechatSerialNo)
             ->do($url, $data);
 
         if ($http->getErrNo() != 0) {

@@ -20,13 +20,13 @@ class Apply extends Base
      * 添加转账明细
      * @param string $outDetailNo 商家明细单号
      * @param float $amount 转账金额(元)
-     * @param string $remark 转账备注
      * @param string $openId 收款用户openid
      * @param string $username 收款用户姓名
+     * @param string $remark 转账备注
      * @return void
      * @throws \Exception
      */
-    public function addTransfer($outDetailNo, $amount, $remark, $openId, $username = '') {
+    public function addTransfer($outDetailNo, $amount, $openId, $username, $remark) {
         if (!preg_match('/^[A-Za-z0-9]{8,32}$/', $outDetailNo)) {
             throw new \Exception('商家明细号由长度为8到32位的大小写字母数字组成');
         }
@@ -35,12 +35,20 @@ class Apply extends Base
             throw new \Exception('转账金额不合法');
         }
 
+        $amount = intval($amount * 100);
+        if ($amount < 30) {
+            throw new \Exception('转账金额最小为 0.3 元');
+        }
+
+        if ($amount >= 200000 && empty($username)) {
+            throw new \Exception('单笔转账超过2000元，必须传入用户姓名');
+        }
+
         $remarkLen = strlen($remark);
         if ($remarkLen< 0 || $remarkLen > 32) {
             throw new \Exception('转账说明必填且最长32个字符');
         }
 
-        $amount *= 100;
         $data = [
             'out_detail_no' => $outDetailNo,
             'transfer_amount' => $amount,
@@ -48,13 +56,10 @@ class Apply extends Base
             'openid' => $openId,
         ];
 
-        if ($amount > 30 && $amount < 2000 && $username != '') {
-            $data['user_name'] = $username;
-        } else if ($amount >= 20000) {
-            if (empty($username)) {
-                throw new \Exception('单笔转账超过2000元，必须传入用户姓名');
-            }
-            $data['user_name'] = $username;
+
+        if (!empty($username)) {
+            openssl_public_encrypt($username, $encryptedUsername, $this->wechatCertContent, OPENSSL_PKCS1_OAEP_PADDING);
+            $data['user_name'] = base64_encode($encryptedUsername);
         }
 
         $this->totalNum +=1;

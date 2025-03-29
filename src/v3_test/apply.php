@@ -6,6 +6,7 @@ require_once 'config.php';
 use tingyu\WeixinTransfer\v3\Apply;
 
 $apiClientKeyFile = file_get_contents('apiclient_test_key.pem');
+$apiClientCertFile = file_get_contents('apiclient_test_cert.pem');
 
 
 $info = [
@@ -20,7 +21,7 @@ $info = [
 ];
 
 
-$transfer = new Apply($conf['appid'], $conf['mchid'], $conf['api_key_v3'], $conf['paySerial'], $apiClientKeyFile);
+$transfer = new Apply($conf['appid'], $conf['mchid'], $conf['api_key_v3'], $conf['paySerial'], $apiClientKeyFile, $conf['wechat_serial_no'], $apiClientCertFile);
 
-$data = $transfer->Exec('Test10011', '1000', 'oPN6d7Th2Peuy9KexAnr_gtO4ZE0','','0.3', '测试', $info, 'https://api3.tianpanshiye.com/api/log/notify');
+$data = $transfer->Exec('Test10015', '1000', 'oPN6d7Th2Peuy9KexAnr_gtO4ZE0','丘益雄','0.3', '测试', $info, 'https://api3.tianpanshiye.com/api/log/notify');
 echo json_encode($data,JSON_PRETTY_PRINT|JSON_UNESCAPED_UNICODE);
