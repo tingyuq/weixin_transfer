@@ -1,6 +1,6 @@
 <?php
 
-require_once dirname(__DIR__) . "/vendor/autoload.php";
+require_once dirname(__DIR__) . "/../vendor/autoload.php";
 require_once 'config.php';
 
 $apiClientKeyFile = file_get_contents('apiclient_test_key.pem');

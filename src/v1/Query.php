@@ -25,7 +25,7 @@ class Query extends Base
 
         $data = [
             'partner_trade_no' => $tradeNo,
-            'mchid' => $this->mchId,
+            'mch_id' => $this->mchId,
             'appid' => $this->appid,
         ];
 
@@ -39,7 +39,7 @@ class Query extends Base
             $errCode = array_key_exists('err_code', $resp) ? $resp['err_code'] : 'SYSTEMERROR';
             $errCodeDes = array_key_exists('err_code_des', $resp) ? $resp['err_code_des'] : $this->errCodes[$errCode];
 
-            throw new \Exception("转账发生错误，错误状态吗：{$errCode}, 错误信息“：{$errCodeDes}");
+            throw new \Exception("发生错误：{$errCode} . {$errCodeDes}");
         }
 
         return $resp;

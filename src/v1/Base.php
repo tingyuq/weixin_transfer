@@ -8,15 +8,16 @@ abstract class Base
 {
     protected $appid;
 
-    protected $appSecret;
+    protected $appKey;
 
     protected $mchId;
 
-    protected $apiClientKeyContent;
+    protected $apiClientKeyCertFile;
+
+    protected $apiClientCertFile;
 
     protected $domain = 'https://api.mch.weixin.qq.com';
 
-    protected $serialNo;
 
     protected $state = [
         'ACCEPTED'=>'转账已受理',
@@ -74,13 +75,13 @@ abstract class Base
      * @param string $paySerial  证书系列号
      * @param string $apiClientKeyFile api私钥文件路径， 或文件内容  //todo 待校验，看文本内容是否可以
     */
-    public function __construct($appid, $appSecret, $mchId, $serialNo, $apiClientKeyContent)
+    public function __construct($appid, $appKey, $mchId, $apiClientCertFile, $apiClientKeyCertFile)
     {
         $this->appid = $appid;
-        $this->appSecret = $appSecret;
+        $this->appKey = $appKey;
         $this->mchId = $mchId;
-        $this->serialNo = $serialNo;
-        $this->apiClientKeyContent = $apiClientKeyContent;
+        $this->apiClientCertFile = $apiClientCertFile;
+        $this->apiClientKeyCertFile = $apiClientKeyCertFile;
     }
 
 
@@ -97,11 +98,12 @@ abstract class Base
         $data['nonce_str'] = $nonce;
 
         ksort($data);
+
         $str = '';
         foreach ($data as $key => $value) {
             $str .= "{$key}={$value}&";
         }
-        $str .= "key={$this->appSecret}";
+        $str .= "key={$this->appKey}";
         $data['sign'] = md5($str);
     }
 
@@ -128,8 +130,7 @@ abstract class Base
         $this->sign($data);
         $xml = $this->arrayToXml($data);
 
-        // todo 需要证书
-        $http->setCertificate('','');
+        $http->setCertificate($this->apiClientCertFile,$this->apiClientKeyCertFile);
         $response = $http->do($url, $xml);
 
         if ($http->getErrNo() != 0) {
@@ -145,5 +146,5 @@ abstract class Base
         return $json;
     }
 
-    abstract function Exec();
+//    abstract function Exec();
 }
