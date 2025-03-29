@@ -18,7 +18,7 @@ $info = [
 ];
 
 
-$transfer = new \tingyu\WeixinTransfer\v2\DetailIdBatchIdQuery($conf['appid'], $conf['mchid'], $conf['paySerial'], $apiClientKeyFile);
+$transfer = new \tingyu\WeixinTransfer\v2\DetailIdBatchIdQuery($conf['appid'], $conf['mchid'], $conf['api_key_v3'], $conf['paySerial'], $apiClientKeyFile);
 
-$data = $transfer->Exec('131000702101206350611632025032838948684975', '132000702101206350611632025032843622731990');
+$data = $transfer->Exec('131000002079006350611632025032942638825863', '132000002079006350611632025032944262803117');
 echo json_encode($data,JSON_PRETTY_PRINT|JSON_UNESCAPED_UNICODE);

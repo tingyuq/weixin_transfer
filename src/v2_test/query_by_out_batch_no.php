@@ -18,7 +18,7 @@ $info = [
 ];
 
 
-$transfer = new \tingyu\WeixinTransfer\v2\OutBatchNoQuery($conf['appid'], $conf['mchid'], $conf['paySerial'], $apiClientKeyFile);
+$transfer = new \tingyu\WeixinTransfer\v2\OutBatchNoQuery($conf['appid'], $conf['mchid'], $conf['api_key_v3'], $conf['paySerial'], $apiClientKeyFile);
 
-$data = $transfer->Exec('batch1001', true, 'ALL');
+$data = $transfer->Exec('batch1002', true, 'ALL');
 echo json_encode($data,JSON_PRETTY_PRINT|JSON_UNESCAPED_UNICODE);

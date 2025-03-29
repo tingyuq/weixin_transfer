@@ -20,7 +20,7 @@ $info = [
 ];
 
 
-$transfer = new Apply($conf['appid'], $conf['mchid'], $conf['paySerial'], $apiClientKeyFile);
+$transfer = new Apply($conf['appid'], $conf['mchid'], $conf['api_key_v3'], $conf['paySerial'], $apiClientKeyFile);
 
-$data = $transfer->Exec('Test10001', '1000', 'oPN6d7Th2Peuy9KexAnr_gtO4ZE0','','0.1', '测试', $info);
+$data = $transfer->Exec('Test10011', '1000', 'oPN6d7Th2Peuy9KexAnr_gtO4ZE0','','0.3', '测试', $info, 'https://api3.tianpanshiye.com/api/log/notify');
 echo json_encode($data,JSON_PRETTY_PRINT|JSON_UNESCAPED_UNICODE);

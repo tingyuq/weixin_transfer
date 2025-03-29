@@ -18,7 +18,7 @@ $info = [
 ];
 
 
-$transfer = new \tingyu\WeixinTransfer\v3\TransferBillNoQuery($conf['appid'], $conf['mchid'], $conf['paySerial'], $apiClientKeyFile);
+$transfer = new \tingyu\WeixinTransfer\v3\Cancel($conf['appid'], $conf['mchid'], $conf['api_key_v3'], $conf['paySerial'], $apiClientKeyFile);
 
-$data = $transfer->Exec('1330007029725762503270028123701769');
+$data = $transfer->Exec('Test10001');
 echo json_encode($data,JSON_PRETTY_PRINT|JSON_UNESCAPED_UNICODE);

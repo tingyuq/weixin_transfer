@@ -12,6 +12,8 @@ abstract class Base
 
     protected $apiClientKeyContent;
 
+    protected $appKeyV3;
+
     protected $domain = 'https://api.mch.weixin.qq.com';
 
     protected $serialNo;
@@ -72,10 +74,11 @@ abstract class Base
      * @param string $paySerial  证书系列号
      * @param string $apiClientKeyFile api私钥文件路径， 或文件内容  //todo 待校验，看文本内容是否可以
     */
-    public function __construct($appid, $mchId, $serialNo, $apiClientKeyContent)
+    public function __construct($appid, $mchId, $appKeyV3, $serialNo, $apiClientKeyContent)
     {
         $this->appid = $appid;
         $this->mchId = $mchId;
+        $this->appKeyV3 = $appKeyV3;
         $this->serialNo = $serialNo;
         $this->apiClientKeyContent = $apiClientKeyContent;
     }
@@ -153,6 +156,4 @@ EOL;
 
         return $json;
     }
-
-    abstract function exec();
 }
