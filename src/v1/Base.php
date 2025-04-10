@@ -16,6 +16,16 @@ abstract class Base
 
     protected $apiClientCertFile;
 
+    /**
+     * @var string 接口请求的原始数据，json、xml
+     */
+    protected $rawResponse;
+
+    /**
+     * @var array 接口请求的袁术数据，解析成数组的
+     */
+    protected $response;
+
     protected $domain = 'https://api.mch.weixin.qq.com';
 
     protected $state = [
@@ -141,8 +151,27 @@ abstract class Base
             throw new \Exception("请求未响应");
         }
 
+        $this->rawResponse = $response;
         $json = $this->xmlToArray($response);
 
+        $this->response = $json;
         return $json;
+    }
+
+    /**
+     * 获取原始的响应数据, xml、json
+     * @return mixed
+     */
+    public function getRawResponse()
+    {
+        return $this->rawResponse;
+    }
+
+    /**
+     * 获取原始解析后的响应数据
+     * @return array
+     */
+    public function getResponse() {
+        return $this->response;
     }
 }

@@ -42,6 +42,16 @@ abstract class Base
      */
     protected $serialNo;
 
+    /**
+     * @var string 接口请求的原始数据，json、xml
+     */
+    protected $rawResponse;
+
+    /**
+     * @var array 接口请求的袁术数据，解析成数组的
+     */
+    protected $response;
+
     protected $domain = 'https://api.mch.weixin.qq.com';
 
     protected $state = [
@@ -174,11 +184,13 @@ EOL;
             throw new \Exception("请求未响应");
         }
 
+        $this->rawResponse = $response;
         $json = json_decode($response, true);
         if (json_last_error() != JSON_ERROR_NONE) {
             throw new \Exception(json_last_error_msg(), json_last_error());
         }
 
+        $this->response = $json;
         if (array_key_exists('code', $json)) {
             $message = array_key_exists('message', $json) ? $json['message'] : '请求报错了，微信未返回报错信息';
 
@@ -186,5 +198,22 @@ EOL;
         }
 
         return $json;
+    }
+
+    /**
+     * 获取原始的响应数据, xml、json
+     * @return mixed
+     */
+    public function getRawResponse()
+    {
+        return $this->rawResponse;
+    }
+
+    /**
+     * 获取原始解析后的响应数据
+     * @return array
+     */
+    public function getResponse() {
+        return $this->response;
     }
 }

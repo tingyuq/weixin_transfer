@@ -80,6 +80,39 @@ class Apply extends Base
 
         $data = $this->execRequest(new Post(), $this->uri, json_encode($formData));
 
+        $msg = '';
+        switch ($data['state']) {
+            case 'PROCESSING':
+                $msg = '转账锁定资金中';
+                break;
+            case 'WAIT_USER_CONFIRM':
+                $msg = ' 待收款用户确认';
+                break;
+            case 'TRANSFERING':
+                $msg = '转账中';
+                break;
+            case 'FAIL':
+                $msg = '转账失败';
+                break;
+            case 'CANCELING':
+                $msg = '商户撤销请求受理成功，该笔转账正在撤销中';
+                break;
+            case 'CANCELLED':
+                $msg = '转账撤销完成';
+                break;
+            case 'SUCCESS':
+                $msg = '该单号已经转账成功，请更换的单号';
+                break;
+        }
+
+        if (!isset($result['package_info']) || empty($result['package_info'])) {
+            $msg = '发起提现异常，缺失用户确认参数';
+        }
+
+        if ($msg != '') {
+            throw new \Exception($msg);
+        }
+
         return $data;
     }
 }
