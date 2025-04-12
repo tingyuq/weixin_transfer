@@ -3,6 +3,9 @@
 namespace tingyu\WeixinTransfer\v3;
 
 use tingyu\HttpRequest\HttpClient;
+use tingyu\HttpRequest\Method\Get;
+use tingyu\WeixinTransfer\util\Cache;
+use tingyu\WeixinTransfer\util\DecryptAes;
 
 abstract class Base
 {
@@ -112,15 +115,80 @@ abstract class Base
      * @param string $wechatSerialNo 平台证书序列号
      * @param string $wechatCertContent 平台证书文件内容
     */
-    public function __construct($appid, $mchId, $appKeyV3, $serialNo, $apiClientKeyContent, $wechatSerialNo, $wechatCertContent)
+    public function __construct($appid, $mchId, $appKeyV3, $serialNo, $apiClientKeyContent)
     {
         $this->appid = $appid;
         $this->mchId = $mchId;
         $this->appKeyV3 = $appKeyV3;
         $this->serialNo = $serialNo;
         $this->apiClientKeyContent = $apiClientKeyContent;
-        $this->wechatSerialNo = $wechatSerialNo;
-        $this->wechatCertContent = $wechatCertContent;
+
+        $this->getWechatSerialInfo();
+    }
+
+
+    /**
+     * 获取微信平台证书
+     * @return array
+     * @throws \Exception
+     */
+    protected function getWechatSerialInfo() {
+        $data = (new Cache())->get($this->appid);
+        if ($data !== false) {
+            $this->wechatSerialNo = $data['serialNo'];
+            $this->wechatCertContent = $data['certText'];
+            return $data;
+        }
+
+        $serialNo = '';
+        $certText = '';
+        $expireTime = 0;
+        $effectiveTime = 0;
+        $nowTime = time();
+
+        $this->wechatSerialNo = '';
+        $data = $this->execRequest(new Get(), '/v3/certificates', '');
+
+        if (empty($data) || !array_key_exists('data', $data)) {
+            throw new \Exception('获取平台证书未响应，联系技术支持');
+        }
+        foreach ($data['data'] as $item) {
+            // 生效时间
+            if (array_key_exists('effective_time', $item)) {
+                $effectiveTime = strtotime($item['effective_time']);
+                // 未生效
+                if ($nowTime < $effectiveTime) {
+                    continue;
+                }
+            }
+
+            // 过期时间
+            if (array_key_exists('expire_time', $item)) {
+                $expireTime = strtotime($item['expire_time']);
+                // 判断过期
+                if ($nowTime >= ($expireTime + 100)) {
+                    continue;
+                }
+            }
+
+            $serialNo = $item['serial_no'];
+            $certText = (new DecryptAes($this->appKeyV3))->decryptToString($item['encrypt_certificate']['associated_data'], $item['encrypt_certificate']['nonce'], $item['encrypt_certificate']['ciphertext']);
+        }
+
+        if (empty($serialNo) || empty($certText)) {
+            throw new \Exception('未获取到有效的平台证书信息');
+        }
+
+        $data = compact('certText', 'serialNo', 'expireTime', 'effectiveTime');
+
+        $subTime = $expireTime - $nowTime;
+        $subTime = $subTime > 43200 ? 43200 : $subTime;   // 微信平台要求12小时请求一次
+        (new Cache())->set($this->appid, $data, $subTime);
+
+        $this->wechatSerialNo = $data['serialNo'];
+        $this->wechatCertContent = $data['certText'];
+
+        return $data;
     }
 
     /**
