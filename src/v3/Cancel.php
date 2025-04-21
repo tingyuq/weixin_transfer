@@ -24,6 +24,17 @@ class Cancel extends Base
 
         $uri = sprintf($this->uri, $outBillNo);
         $data = $this->execRequest(new Post(), $uri, '');
+        if (array_key_exists('code', $data)) {
+            $message = array_key_exists('message', $data) ? $data['message'] : '请求报错了，微信未返回报错信息';
+            throw new \Exception($message);
+        }
+
+        if (!array_key_exists('state', $data)) {
+            throw new \Exception('微信返回值缺失"单据状态 [state]"');
+        }
+
+        $data['state_info'] = array_key_exists($data['state'], $this->state) ? $this->state[$data['state']] : $this->state['other'];
+
         return $data;
     }
 }

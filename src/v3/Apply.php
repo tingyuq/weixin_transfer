@@ -80,35 +80,26 @@ class Apply extends Base
 
         $data = $this->execRequest(new Post(), $this->uri, json_encode($formData));
 
-        $msg = '';
-        switch ($data['state']) {
-            case 'PROCESSING':
-                $msg = '转账锁定资金中';
-                break;
-            case 'TRANSFERING':
-                $msg = '转账中';
-                break;
-            case 'FAIL':
-                $msg = '转账失败';
-                break;
-            case 'CANCELING':
-                $msg = '商户撤销请求受理成功，该笔转账正在撤销中';
-                break;
-            case 'CANCELLED':
-                $msg = '转账撤销完成';
-                break;
-            case 'SUCCESS':
-                $msg = '该单号已经转账成功，请更换的单号';
-                break;
+        if (array_key_exists('code', $data)) {
+            $message = array_key_exists('message', $data) ? $data['message'] : '请求报错了，微信未返回报错信息';
+            throw new \Exception($message);
         }
 
-        if (!isset($result['package_info']) || empty($result['package_info'])) {
-            $msg = '发起提现异常，缺失用户确认参数';
+        if (!array_key_exists('state', $data)) {
+            throw new \Exception('微信返回值缺失"单据状态 [state]"');
         }
 
-        if ($msg != '') {
-            throw new \Exception($msg);
+        if ($data['state'] == 'ACCEPTED' && (!array_key_exists('package_info', $data) || empty($data['package_info']))) {
+            throw new \Exception('微信返回值缺失"收款页的package信息 [package_info]"');
         }
+
+        $data['reason_info'] = '';
+        if ($data['state'] == 'FAIL') {
+            $reasonKey = array_key_exists('fail_reason', $data) ? $data['fail_reason'] : "other";
+            $data['reason_info'] = $this->reason[$reasonKey];
+        }
+
+        $data['state_info'] = array_key_exists($data['state'], $this->state) ? $this->state[$data['state']] : $this->state['other'];
 
         return $data;
     }

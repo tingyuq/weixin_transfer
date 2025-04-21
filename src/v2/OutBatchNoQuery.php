@@ -53,6 +53,11 @@ class OutBatchNoQuery extends Base
         $queryStr = http_build_query($param);
         $uri = sprintf($this->uri, $outBatchNo, $queryStr);
         $data = $this->execRequest(new Get(), $uri, '');
+        if (array_key_exists('code', $data)) {
+            $message = array_key_exists('message', $data) ? $data['message'] : '请求报错了，微信未返回报错信息';
+            throw new \Exception($message);
+        }
+
         if ($data['transfer_batch']['batch_status'] == 'CLOSED') {
             $closeReason = array_key_exists('close_reason', $data['transfer_batch']) ? $data['transfer_batch']['close_reason'] : 'other';
             throw new \Exception($this->closeReason[$closeReason]);
