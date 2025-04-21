@@ -256,6 +256,11 @@ EOL;
             throw new \Exception(json_last_error_msg(), json_last_error());
         }
 
+        // 请求证书只需要返回即可
+        if ($uri == '/v3/certificates') {
+            return $json;
+        }
+
         $this->response = $json;
         if (array_key_exists('code', $json)) {
             $message = array_key_exists('message', $json) ? $json['message'] : '请求报错了，微信未返回报错信息';

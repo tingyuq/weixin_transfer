@@ -20,5 +20,5 @@ $info = [
 
 $transfer = new \tingyu\WeixinTransfer\v3\Cancel($conf['appid'], $conf['mchid'], $conf['api_key_v3'], $conf['paySerial'], $apiClientKeyFile);
 
-$data = $transfer->Exec('Test10001');
+$data = $transfer->Exec('THWH2504211236118526827');
 echo json_encode($data,JSON_PRETTY_PRINT|JSON_UNESCAPED_UNICODE);

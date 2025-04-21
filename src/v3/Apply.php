@@ -61,7 +61,7 @@ class Apply extends Base
         $formData = [
             'appid' => $this->appid,
             'out_bill_no' => $outBillNo,
-            'transfer_scene_id' => $sceneId,
+            'transfer_scene_id' => (string)$sceneId,
             'openid' => $openId,
             'transfer_amount' => $amount,
             'transfer_remark' => $remark,
@@ -84,9 +84,6 @@ class Apply extends Base
         switch ($data['state']) {
             case 'PROCESSING':
                 $msg = '转账锁定资金中';
-                break;
-            case 'WAIT_USER_CONFIRM':
-                $msg = ' 待收款用户确认';
                 break;
             case 'TRANSFERING':
                 $msg = '转账中';
