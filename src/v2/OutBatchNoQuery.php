@@ -58,9 +58,10 @@ class OutBatchNoQuery extends Base
             throw new \Exception($message);
         }
 
+        $data['transfer_batch']['batch_status_info'] = null;
         if ($data['transfer_batch']['batch_status'] == 'CLOSED') {
             $closeReason = array_key_exists('close_reason', $data['transfer_batch']) ? $data['transfer_batch']['close_reason'] : 'other';
-            throw new \Exception($this->closeReason[$closeReason]);
+            $data['transfer_batch']['batch_status_info'] = $this->closeReason[$closeReason];
         }
 
 

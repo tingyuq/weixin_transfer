@@ -63,9 +63,10 @@ class DetailIdBatchIdQuery extends Base
             throw new \Exception($message);
         }
 
+        $data['fail_reason_info'] = null;
         if ($data['detail_status'] == 'FAIL') {
             $failReason = array_key_exists('fail_reason',$data) ? $data['fail_reason']: 'other';
-            throw new \Exception($this->failReasons[$failReason]);
+            $data['fail_reason_info'] = $this->failReasons[$failReason];
         }
 
         return $data;

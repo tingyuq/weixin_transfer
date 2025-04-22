@@ -110,22 +110,6 @@ class Apply extends Base
             throw new \Exception($message);
         }
 
-        $msg = '';
-        switch ($data['batch_status']) {
-            case 'PROCESSING':
-                $msg = '转账中';
-                break;
-            case 'FINISHED':
-                $msg = '已完成';
-                break;
-            case 'CLOSED':
-                $msg = '已关闭。可查询具体的批次关闭原因确认';
-                break;
-        }
-        if ($msg != '') {
-            throw new \Exception($msg);
-        }
-
         return $data;
     }
 }
