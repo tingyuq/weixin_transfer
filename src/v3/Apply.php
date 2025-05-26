@@ -32,7 +32,8 @@ class Apply extends Base
             throw new \Exception('转账金额不合法');
         }
 
-        $amount = intval($amount * 100);
+        $amount = bcmul($amount, '100',2);
+        $amount = intval($amount);
         if ($amount < 30) {
             throw new \Exception('转账金额最小为 0.3 元');
         }
