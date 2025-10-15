@@ -149,6 +149,10 @@ abstract class Base
         $this->wechatSerialNo = '';
         $data = $this->execRequest(new Get(), '/v3/certificates', '');
 
+        if (array_key_exists('code', $data) && $data['code'] ==  "RESOURCE_NOT_EXISTS") {
+            throw new \Exception('请检查验证微信支付身份使用的是平台证书还是支付公钥');
+        }
+
         if (empty($data) || !array_key_exists('data', $data)) {
             throw new \Exception('获取平台证书未响应，联系技术支持');
         }
