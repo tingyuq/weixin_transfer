@@ -59,6 +59,33 @@ class Apply extends Base
             throw new \Exception('转账备注必填且最长32个字符');
         }
 
+        switch ($sceneId) {
+            case 1000:
+                $sceneTitle = '现金营销';
+                break;
+            case 1011:
+                $sceneTitle = "企业赔付";
+                break;
+            case 1005:
+                $sceneTitle = '劳务报酬';
+                break;
+            case 1009:
+                $sceneTitle = '货款';
+                break;
+            case 1010:
+                $sceneTitle = "二手回收货款";
+                break;
+            case 1013:
+                $sceneTitle = '公益补助金';
+                break;
+            case 1002:
+                $sceneTitle = '行政补贴';
+                break;
+            case 1004:
+                $sceneTitle = "保险理赔款";
+                break;
+        }
+
         $formData = [
             'appid' => $this->appid,
             'out_bill_no' => $outBillNo,
@@ -66,7 +93,7 @@ class Apply extends Base
             'openid' => $openId,
             'transfer_amount' => $amount,
             'transfer_remark' => $remark,
-            "user_recv_perception" => "现金奖励",
+            "user_recv_perception" => $sceneTitle,
             'transfer_scene_report_infos' => $sceneInfo,
         ];
 
