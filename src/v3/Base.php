@@ -51,7 +51,7 @@ abstract class Base
     protected $rawResponse;
 
     /**
-     * @var array 接口请求的袁术数据，解析成数组的
+     * @var array 接口请求的原始数据，解析成数组的
      */
     protected $response;
 
@@ -111,9 +111,8 @@ abstract class Base
      * @param string $appid 应用appid
      * @param string $mchId 商户号id
      * @param string $serialNo  证书系列号
+     * @param string $appKeyV3 v3密钥
      * @param string $apiClientKeyContent 支付证书密钥文件内容
-     * @param string $wechatSerialNo 平台证书序列号
-     * @param string $wechatCertContent 平台证书文件内容
     */
     public function __construct($appid, $mchId, $appKeyV3, $serialNo, $apiClientKeyContent)
     {
@@ -133,7 +132,7 @@ abstract class Base
      * @throws \Exception
      */
     protected function getWechatSerialInfo() {
-        $data = (new Cache())->get($this->appid);
+        $data = (new Cache())->get(sprintf("%s_%s",$this->appid, $this->mchId));
         if ($data !== false) {
             $this->wechatSerialNo = $data['serialNo'];
             $this->wechatCertContent = $data['certText'];
@@ -177,6 +176,7 @@ abstract class Base
 
             $serialNo = $item['serial_no'];
             $certText = (new DecryptAes($this->appKeyV3))->decryptToString($item['encrypt_certificate']['associated_data'], $item['encrypt_certificate']['nonce'], $item['encrypt_certificate']['ciphertext']);
+            break;
         }
 
         if (empty($serialNo) || empty($certText)) {
@@ -187,7 +187,7 @@ abstract class Base
 
         $subTime = $expireTime - $nowTime;
         $subTime = $subTime > 43200 ? 43200 : $subTime;   // 微信平台要求12小时请求一次
-        (new Cache())->set($this->appid, $data, $subTime);
+        (new Cache())->set(sprintf("%s_%s",$this->appid, $this->mchId), $data, $subTime);
 
         $this->wechatSerialNo = $data['serialNo'];
         $this->wechatCertContent = $data['certText'];
@@ -205,7 +205,7 @@ abstract class Base
     protected function getAuth($method, $uri, $data)
     {
         $time = time();
-        $nonce = general_nonce_string(32);
+        $nonce = generate_nonce_string(32);
 
 
     $str = <<<EOL

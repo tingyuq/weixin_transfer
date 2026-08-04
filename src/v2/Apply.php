@@ -46,7 +46,7 @@ class Apply extends Base
         }
 
         $remarkLen = strlen($remark);
-        if ($remarkLen< 0 || $remarkLen > 32) {
+        if ($remarkLen == 0 || $remarkLen > 32) {
             throw new \Exception('转账说明必填且最长32个字符');
         }
 
@@ -59,7 +59,10 @@ class Apply extends Base
 
 
         if (!empty($username)) {
-            openssl_public_encrypt($username, $encryptedUsername, $this->wechatCertContent, OPENSSL_PKCS1_OAEP_PADDING);
+            $encrypt = openssl_public_encrypt($username, $encryptedUsername, $this->wechatCertContent, OPENSSL_PKCS1_OAEP_PADDING);
+            if (!$encrypt) {
+                throw new \Exception('敏感信息加密失败,重试或联系技术');
+            }
             $data['user_name'] = base64_encode($encryptedUsername);
         }
 
@@ -87,7 +90,7 @@ class Apply extends Base
         }
 
         $remarkLen = strlen($batchRemark);
-        if ($remarkLen< 0 || $remarkLen > 32) {
+        if ($remarkLen > 32) {
             throw new \Exception('转账说明必填且最长32个字符');
         }
 
@@ -106,11 +109,18 @@ class Apply extends Base
         }
 
         $data = $this->execRequest(new Post(), $this->uri, json_encode($formData));
+        $this->init();
         if (array_key_exists('code', $data)) {
             $message = array_key_exists('message', $data) ? $data['message'] : '请求报错了，微信未返回报错信息';
             throw new \Exception($message);
         }
 
         return $data;
+    }
+
+    private function init() {
+        $this->totalNum =  0;
+        $this->totalAmount = 0;
+        $this->transferDetailList = [];
     }
 }

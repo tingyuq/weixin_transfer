@@ -18,7 +18,7 @@ class Cache
         $cacheDir = $pwd . DIRECTORY_SEPARATOR . 'cache' ;
         if (!is_dir($cacheDir)) {
             try {
-                mkdir($cacheDir, '0755', true);
+                mkdir($cacheDir, 0755, true);
             }catch (\Exception $e) {
                 return false;
             }
@@ -31,7 +31,7 @@ class Cache
             'cache' => $value,
         ];
         $result = file_put_contents($cacheFile, serialize($data), LOCK_EX);
-        if ($result !== false) {
+        if ($result === false) {
             return false;
         }
 

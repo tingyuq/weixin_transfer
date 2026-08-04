@@ -55,7 +55,7 @@ class Apply extends Base
         }
 
         $remarkLen = strlen($remark);
-        if ($remarkLen< 0 || $remarkLen > 32) {
+        if ($remarkLen == 0 || $remarkLen > 32) {
             throw new \Exception('转账备注必填且最长32个字符');
         }
 
@@ -84,6 +84,8 @@ class Apply extends Base
             case 1004:
                 $sceneTitle = "保险理赔款";
                 break;
+            default:
+                throw new \Exception("未支持转账场景ID:{$sceneId}，联系技术支持");
         }
 
         $formData = [
@@ -98,7 +100,10 @@ class Apply extends Base
         ];
 
         if (!empty($userName)) {
-            openssl_public_encrypt($userName, $encryptedUsername, $this->wechatCertContent, OPENSSL_PKCS1_OAEP_PADDING);
+            $encrypt = openssl_public_encrypt($userName, $encryptedUsername, $this->wechatCertContent, OPENSSL_PKCS1_OAEP_PADDING);
+            if (!$encrypt) {
+                throw new \Exception('敏感信息加密失败,重试或联系技术');
+            }
             $formData['user_name'] = base64_encode($encryptedUsername);
         }
 

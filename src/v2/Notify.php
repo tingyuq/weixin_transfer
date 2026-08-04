@@ -36,7 +36,12 @@ class Notify extends Base
 
         $data = $decrypt->decryptToString($resource['associated_data'], $resource['nonce'], $resource['ciphertext']);
 
-        return json_decode($data, true);
+        $data = json_decode($data, true);
+        if (json_last_error() != JSON_ERROR_NONE) {
+            throw new \Exception('Decrypt data error');
+        }
+
+		return $data;
     }
 
 

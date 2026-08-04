@@ -3,18 +3,14 @@
 namespace tingyu\WeixinTransfer\v2;
 
 /**
- * 发起商家转账
+ * 获取微信平台证书
  */
 class Certificate extends Base
 {
     private $uri = '/v3/certificates';
 
     /**
-     * @param string $outBatchNo 商家批次单号
-     * @param string $batchName 批次名称
-     * @param string $batchRemark 批次备注
-     * @param string $notifyUrl 异步通知地址
-     * @return mixed
+     * @return array
      * @throws \Exception
      */
     public function Exec() {

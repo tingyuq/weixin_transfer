@@ -35,7 +35,7 @@ class DecryptAes
      * @param string $nonceStr AES GCM nonce
      * @param string $ciphertext AES GCM cipher text
      * @return string|bool      Decrypted string on success or FALSE on failure
-     * @throws InvalidDecryptException
+     * @throws \Exception
      */
     public function decryptToString($associatedData, $nonceStr, $ciphertext)
     {
@@ -58,11 +58,11 @@ class DecryptAes
                 $authTag = substr($ciphertext, -self::AUTH_TAG_LENGTH_BYTE);
                 return \openssl_decrypt($ctext, 'aes-256-gcm', $this->aesKey, \OPENSSL_RAW_DATA, $nonceStr, $authTag, $associatedData);
             }
-        } catch (\Exception $exception) {
-            throw new \Exception($exception->getMessage(), $exception->getCode());
         } catch (\SodiumException $exception) {
-            throw new \Exception($exception->getMessage(), $exception->getCode());
+            throw new \Exception($exception->getMessage(), $exception->getCode(), $exception);
+        } catch (\Exception $exception) {
+            throw new \Exception($exception->getMessage(), $exception->getCode(), $exception);
         }
-        throw new InvalidDecryptException('AEAD_AES_256_GCM 需要 PHP 7.1 以上或者安装 libsodium-php');
+        throw new \Exception('AEAD_AES_256_GCM 需要 PHP 7.1 以上或者安装 libsodium-php');
     }
 }

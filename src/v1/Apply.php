@@ -49,7 +49,7 @@ class Apply extends Base
     public function Exec($tradeNo, $amount, $openid, $username, $desc)
     {
         if (!preg_match('/^[A-Za-z0-9]{8,32}$/', $tradeNo)) {
-            throw new \Exception('商互订单号由长度为8到32位的大小写字母数字组成');
+            throw new \Exception('商户订单号由长度为8到32位的大小写字母数字组成');
         }
 
         if (!preg_match('/^(0|[1-9]\d*)(\.\d{1,2})?$/', $amount)) {
@@ -91,7 +91,7 @@ class Apply extends Base
             $errCode = array_key_exists('err_code', $resp) ? $resp['err_code'] : 'SYSTEMERROR';
             $errCodeDes = array_key_exists('err_code_des', $resp) ? $resp['err_code_des'] : $this->errCodes[$errCode];
 
-            throw new \Exception("转账发生错误，错误状态吗：{$errCode}, 错误信息“：{$errCodeDes}");
+            throw new \Exception("转账发生错误，错误状态码：{$errCode}, 错误信息：{$errCodeDes}");
         }
 
         return $resp;

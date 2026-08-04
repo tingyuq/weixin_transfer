@@ -22,7 +22,7 @@ abstract class Base
     protected $rawResponse;
 
     /**
-     * @var array 接口请求的袁术数据，解析成数组的
+     * @var array 接口请求的原始数据，解析成数组的
      */
     protected $response;
 
@@ -103,8 +103,7 @@ abstract class Base
      */
     private function sign(&$data)
     {
-        $time = time();
-        $nonce = general_nonce_string(32);
+        $nonce = generate_nonce_string(32);
         $data['nonce_str'] = $nonce;
 
         ksort($data);
