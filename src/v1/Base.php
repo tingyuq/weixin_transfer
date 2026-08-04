@@ -119,7 +119,7 @@ abstract class Base
     private function arrayToXml($data){
         $str='<xml>';
         foreach($data as $k=>$v) {
-            $str.='<'.$k.'>'.$v.'</'.$k.'>';
+            $str.='<'.$k.'><![CDATA['.$v.']]></'.$k.'>';
         }
         $str.='</xml>';
         return $str;
