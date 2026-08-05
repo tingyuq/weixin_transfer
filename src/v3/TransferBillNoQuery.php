@@ -2,8 +2,6 @@
 
 namespace tingyu\WeixinTransfer\v3;
 
-use tingyu\HttpRequest\Method\Get;
-
 /**
  * 微信单号查询转账单
  */
@@ -24,7 +22,7 @@ class TransferBillNoQuery extends Base
         }
 
         $uri = sprintf($this->uri, $transferBillNo);
-        $data = $this->execRequest(new Get(), $uri, '');
+        $data = $this->execRequest($this->methodGet, $uri, '');
         if (array_key_exists('code', $data)) {
             $message = array_key_exists('message', $data) ? $data['message'] : '请求报错了，微信未返回报错信息';
             throw new \Exception($message);

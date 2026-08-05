@@ -21,7 +21,12 @@ $info = [
 ];
 
 
-$transfer = new Apply($conf['appid'], $conf['mchid'], $conf['api_key_v3'], $conf['paySerial'], $apiClientKeyFile, $conf['wechat_serial_no'], $apiClientCertFile);
+$transfer = new Apply();
+$transfer->setAppid($conf['appid'])
+    ->setMchId($conf['mchid'])
+    ->setAppKeyV3($conf['api_key_v3'])
+    ->setSerialNo($conf['paySerial'])
+    ->setApiClientKeyContent($apiClientCertFile);
 
 $data = $transfer->Exec('Test10015', '1000', 'oPN6d7Th2Peuy9KexAnr_gtO4ZE0','丘益雄','0.3', '测试', $info, 'https://api3.tianpanshiye.com/api/log/notify');
 echo json_encode($data,JSON_PRETTY_PRINT|JSON_UNESCAPED_UNICODE);

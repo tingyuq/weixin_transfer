@@ -2,8 +2,6 @@
 
 namespace tingyu\WeixinTransfer\v2;
 
-use tingyu\HttpRequest\Method\Post;
-
 /**
  * 发起商家转账
  */
@@ -108,7 +106,7 @@ class Apply extends Base
             $formData['notify_url'] = $notifyUrl;
         }
 
-        $data = $this->execRequest(new Post(), $this->uri, json_encode($formData));
+        $data = $this->execRequest($this->methodPost, $this->uri, json_encode($formData));
         $this->init();
         if (array_key_exists('code', $data)) {
             $message = array_key_exists('message', $data) ? $data['message'] : '请求报错了，微信未返回报错信息';

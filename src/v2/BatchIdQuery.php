@@ -2,8 +2,6 @@
 
 namespace tingyu\WeixinTransfer\v2;
 
-use tingyu\HttpRequest\Method\Get;
-
 /**
  * 微信批次单号查询批次单
  */
@@ -51,7 +49,7 @@ class BatchIdQuery extends Base
 
         $queryStr = http_build_query($param);
         $uri = sprintf($this->uri, $batchId, $queryStr);
-        $data = $this->execRequest(new Get(), $uri, '');
+        $data = $this->execRequest($this->methodGet, $uri, '');
         if (array_key_exists('code', $data)) {
             $message = array_key_exists('message', $data) ? $data['message'] : '请求报错了，微信未返回报错信息';
             throw new \Exception($message);

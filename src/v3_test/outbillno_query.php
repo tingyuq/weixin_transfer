@@ -17,7 +17,12 @@ $info = [
 ];
 
 
-$transfer = new \tingyu\WeixinTransfer\v3\OutBillNoQuery($conf['appid'], $conf['mchid'], $conf['api_key_v3'], $conf['paySerial'], $apiClientKeyFile);
+$transfer = new \tingyu\WeixinTransfer\v3\OutBillNoQuery(null);
+$transfer->setAppid($conf['appid'])
+    ->setMchId($conf['mchid'])
+    ->setAppKeyV3($conf['api_key_v3'])
+    ->setSerialNo($conf['paySerial'])
+    ->setApiClientKeyContent($apiClientKeyFile);
 
 $data = $transfer->Exec('Test10011');
 echo json_encode($data, JSON_PRETTY_PRINT|JSON_UNESCAPED_UNICODE);

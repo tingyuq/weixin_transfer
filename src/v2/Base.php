@@ -2,13 +2,21 @@
 
 namespace tingyu\WeixinTransfer\v2;
 
-use tingyu\HttpRequest\HttpClient;
-use tingyu\HttpRequest\Method\Get;
+use Hyperf\Guzzle\ClientFactory;
+use tingyu\WeixinTransfer\tool\NonceStr;
 use tingyu\WeixinTransfer\util\Cache;
 use tingyu\WeixinTransfer\util\DecryptAes;
 
 abstract class Base
 {
+    use NonceStr;
+
+    protected $methodGet = 'GET';
+    protected $methodPost = 'POST';
+    protected $methodPut = 'PUT';
+    protected $methodDelete = 'DELETE';
+
+
     /**
      * @var string 小程序标识 appid
      */
@@ -56,6 +64,8 @@ abstract class Base
     protected $response;
 
     protected $domain = 'https://api.mch.weixin.qq.com';
+
+    private ClientFactory $clientFactory;
 
     protected $state = [
         'ACCEPTED'=>'转账已受理',
@@ -114,7 +124,7 @@ abstract class Base
      * @param string $serialNo  证书系列号
      * @param string $apiClientKeyContent 支付证书密钥文件内容
      */
-    public function __construct($appid, $mchId, $appKeyV3, $serialNo, $apiClientKeyContent)
+    public function __construct(ClientFactory $clientFactory, $appid, $mchId, $appKeyV3, $serialNo, $apiClientKeyContent)
     {
         $this->appid = $appid;
         $this->mchId = $mchId;
@@ -122,8 +132,9 @@ abstract class Base
         $this->serialNo = $serialNo;
         $this->apiClientKeyContent = $apiClientKeyContent;
 
-        $this->getWechatSerialInfo();
+        $this->clientFactory = $clientFactory;
 
+        $this->getWechatSerialInfo();
     }
 
     /**
@@ -146,7 +157,7 @@ abstract class Base
         $nowTime = time();
 
         $this->wechatSerialNo = '';
-        $data = $this->execRequest(new Get(), '/v3/certificates', '');
+        $data = $this->execRequest($this->methodGet, '/v3/certificates', '');
 
         if (array_key_exists('code', $data) && $data['code'] ==  "RESOURCE_NOT_EXISTS") {
             throw new \Exception('请检查验证微信支付身份使用的是平台证书还是支付公钥');
@@ -206,7 +217,7 @@ abstract class Base
     protected function getAuth($method, $uri, $data)
     {
         $time = time();
-        $nonce = generate_nonce_string(32);
+        $nonce = $this->GenNonceStr(32);
 
 
     $str = <<<EOL
@@ -234,29 +245,51 @@ EOL;
     }
 
 
-    protected function execRequest(HttpClient $http, $uri, $data) {
+    protected function execRequest($method, $uri, $data) {
 
         $url = $this->domain. $uri;
-        $className = explode('\\', strtoupper(get_class($http)));
 
-        $auth = $this->getAuth($className[3], $uri, $data);
+        $auth = $this->getAuth($method, $uri, $data);
 
-        $response = $http->setHeader('Authorization', $auth)
-            ->setHeader('Accept', 'application/json')
-            ->setHeader('Content-Type', 'application/json')
-            ->setHeader('Wechatpay-Serial', $this->wechatSerialNo)
-            ->do($url, $data);
+        $client = $this->clientFactory->create([
+            'timeout' => 15.0,
+            'connect_timeout' => 8.0,
+            'http_errors' => false,
+        ]);
+        $options = [
+            'headers' => [
+                'Accept' => 'application/json',
+                'Authorization' => $auth,
+                'Content-Type' => 'application/json',
+                'Wechatpay-Serial' =>$this->wechatSerialNo,
+            ]
+        ];
 
-        if ($http->getErrNo() != 0) {
-            throw new \Exception($http->getErrMsg(), $http->getErrNo());
+        $response = null;
+        switch ($method) {
+            case $this->methodPost:
+                $options['body'] = $data;
+                $response = $client->post($url, $options);
+                break;
+            case $this->methodGet:
+                if (!empty($data)) {
+                    if (is_array($data) || is_object($data)) {
+                        $queryStr = http_build_query($data);
+                        $url = sprintf("%s?%s", $url, $queryStr);
+                    }
+                    $response = $client->get($url);
+                }
+                break;
+            default:
+                throw new \Exception('未支持的http请求方法');
         }
 
-        if ($response == '') {
+        if (empty($response)) {
             throw new \Exception("请求未响应");
         }
 
-        $this->rawResponse = $response;
-        $json = json_decode($response, true);
+        $this->rawResponse = $response->getBody();
+        $json = json_decode($response->getBody(), true);
         if (json_last_error() != JSON_ERROR_NONE) {
             throw new \Exception(json_last_error_msg(), json_last_error());
         }

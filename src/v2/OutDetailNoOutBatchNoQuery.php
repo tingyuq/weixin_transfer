@@ -2,7 +2,6 @@
 
 namespace tingyu\WeixinTransfer\v2;
 
-use tingyu\HttpRequest\Method\Get;
 
 /**
  * 商家明细单号查询明细单
@@ -58,7 +57,7 @@ class OutDetailNoOutBatchNoQuery extends Base
 
 
         $uri = sprintf($this->uri, $outBatchNo, $outDetailNo);
-        $data = $this->execRequest(new Get(), $uri, '');
+        $data = $this->execRequest($this->methodGet, $uri, '');
         if (array_key_exists('code', $data)) {
             $message = array_key_exists('message', $data) ? $data['message'] : '请求报错了，微信未返回报错信息';
             throw new \Exception($message);
