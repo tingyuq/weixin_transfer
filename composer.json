@@ -16,7 +16,7 @@
         }
     },
     "require": {
-        "php": ">=7.0",
+        "php": ">=8.1",
         "ext-curl": "*",
         "ext-json": "*",
         "ext-openssl": "*",
@@ -24,7 +24,8 @@
         "ext-simplexml": "*",
         "ext-bcmath": "*",
         "ext-sodium": "*",
-        "hyperf/guzzle": "~3.1.0"
+        "hyperf/guzzle": "~3.1.0",
+        "ext-libxml": "*"
     },
     "autoload": {
         "psr-4": {

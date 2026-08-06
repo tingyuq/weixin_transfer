@@ -7,8 +7,6 @@ namespace tingyu\WeixinTransfer\v2;
  */
 class Certificate extends Base
 {
-    private $uri = '/v3/certificates';
-
     /**
      * @return array
      * @throws \Exception

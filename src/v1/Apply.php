@@ -80,7 +80,7 @@ class Apply extends Base
             $data['re_user_name'] = $username;
         }
 
-        $resp = $this->execRequest($this->methodPost, $this->uri, $data);
+        $resp = $this->execRequest(self::METHOD_POST, $this->uri, $data);
         if ($resp['return_code'] == 'FAIL') {
             $msg = array_key_exists('return_msg', $resp) ? $resp['return_msg'] : 'return_code = FAIL, 未返回实际原因，联系技术支持';
             throw new \Exception($msg);

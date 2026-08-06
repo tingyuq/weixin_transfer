@@ -88,7 +88,7 @@ class Apply extends Base
         }
 
         $remarkLen = strlen($batchRemark);
-        if ($remarkLen > 32) {
+        if ($remarkLen == 0 || $remarkLen > 32) {
             throw new \Exception('转账说明必填且最长32个字符');
         }
 
@@ -106,7 +106,7 @@ class Apply extends Base
             $formData['notify_url'] = $notifyUrl;
         }
 
-        $data = $this->execRequest($this->methodPost, $this->uri, json_encode($formData));
+        $data = $this->execRequest(self::METHOD_POST, $this->uri, json_encode($formData));
         $this->init();
         if (array_key_exists('code', $data)) {
             $message = array_key_exists('message', $data) ? $data['message'] : '请求报错了，微信未返回报错信息';

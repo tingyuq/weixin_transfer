@@ -9,12 +9,6 @@ class BatchIdQuery extends Base
 {
     private $uri = '/v3/transfer/batches/batch-id/%s?%s';
 
-    private $closeReason = [
-        'OVERDUE_CLOSE' => '系统超时关闭，可能原因账户余额不足或其他错误',
-        'TRANSFER_SCENE_INVALID' => '付款确认时，转账场景已不可用，系统做关单处理',
-        'other' => '微信转账批次关闭，原因未知，详情登录商户号查询'
-    ];
-
     /**
      * @param string $batchId 微信批次单号
      * @param bool $needDetail 是否查询转账明细单,true-是；false-否
@@ -49,7 +43,7 @@ class BatchIdQuery extends Base
 
         $queryStr = http_build_query($param);
         $uri = sprintf($this->uri, $batchId, $queryStr);
-        $data = $this->execRequest($this->methodGet, $uri, '');
+        $data = $this->execRequest(self::METHOD_GET, $uri, '');
         if (array_key_exists('code', $data)) {
             $message = array_key_exists('message', $data) ? $data['message'] : '请求报错了，微信未返回报错信息';
             throw new \Exception($message);
@@ -58,7 +52,7 @@ class BatchIdQuery extends Base
         $data['transfer_batch']['batch_status_info'] = null;
         if ($data['transfer_batch']['batch_status'] == 'CLOSED') {
             $closeReason = array_key_exists('close_reason', $data['transfer_batch']) ? $data['transfer_batch']['close_reason'] : 'other';
-            $data['transfer_batch']['batch_status_info'] = $this->closeReason[$closeReason];
+            $data['transfer_batch']['batch_status_info'] = self::FAIL_REASONS[$closeReason];
         }
 
         return $data;
