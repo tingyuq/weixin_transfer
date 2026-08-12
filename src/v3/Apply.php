@@ -59,10 +59,10 @@ class Apply extends Base
 
         switch ($sceneId) {
             case 1000:
-                $sceneTitle = '现金营销';
+                $sceneTitle = '活动奖励';
                 break;
             case 1011:
-                $sceneTitle = "企业赔付";
+                $sceneTitle = "退款";
                 break;
             case 1005:
                 $sceneTitle = '劳务报酬';
