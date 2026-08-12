@@ -157,8 +157,22 @@ abstract class CommonBase
         $this->wechatSerialNo = '';
         $data = $this->execRequest(self::METHOD_GET, '/v3/certificates', '');
 
-        if (array_key_exists('code', $data) && $data['code'] ==  "RESOURCE_NOT_EXISTS") {
-            throw new \Exception('请检查验证微信支付身份使用的是平台证书还是支付公钥');
+        if (array_key_exists('code', $data)) {
+            switch ($data['code']) {
+                case "RESOURCE_NOT_EXISTS":
+                    throw new \Exception('请检查验证微信支付身份使用的是平台证书还是支付公钥');
+                    break;
+                case "SIGN_ERROR":
+                    throw new \Exception('错误的签名，验签失败');
+                    break;
+                default:
+                    if (array_key_exists('message', $data)) {
+                        throw new \Exception($data['message']);
+                    } else {
+                        throw new \Exception("获取证书异常，code:{$data['code']}");
+                    }
+            }
+
         }
 
         if (empty($data) || !array_key_exists('data', $data)) {
@@ -217,16 +231,7 @@ abstract class CommonBase
         $time = time();
         $nonce = $this->GenNonceStr(32);
 
-
-        $str = <<<EOL
-$method
-$uri
-$time
-$nonce
-$data
-
-EOL;
-
+        $str = "{$method}\n{$uri}\n{$time}\n{$nonce}\n{$data}\n";
         $privateKey = openssl_pkey_get_private($this->apiClientKeyContent);
         if ($privateKey === false) {
             throw new \Exception('无法从PEM字符串中获取私钥信息');
