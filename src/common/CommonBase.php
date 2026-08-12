@@ -279,7 +279,7 @@ EOL;
                     }
                     $url = sprintf("%s?%s", $url, $queryStr);
                 }
-                $response = $client->get($url);
+                $response = $client->get($url, $options);
                 break;
             default:
                 throw new \Exception('未支持的http请求方法');
