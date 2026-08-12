@@ -259,7 +259,8 @@ EOL;
                 'Accept' => 'application/json',
                 'Authorization' => $auth,
                 'Content-Type' => 'application/json',
-                'Wechatpay-Serial' =>$this->wechatSerialNo,
+                'Wechatpay-Serial' => $this->wechatSerialNo,
+                'User-Agent' => 'security-guard-wechatpay',
             ]
         ];
 
