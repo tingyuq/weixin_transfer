@@ -24,7 +24,6 @@
         "ext-mbstring": "*",
         "ext-simplexml": "*",
         "ext-bcmath": "*",
-        "ext-sodium": "*",
         "ext-libsodium": "*"
     },
     "autoload": {
