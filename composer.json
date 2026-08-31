@@ -23,8 +23,7 @@
         "ext-openssl": "*",
         "ext-mbstring": "*",
         "ext-simplexml": "*",
-        "ext-bcmath": "*",
-        "ext-libsodium": "*"
+        "ext-bcmath": "*"
     },
     "autoload": {
         "psr-4": {
