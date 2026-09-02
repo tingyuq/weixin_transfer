@@ -28,9 +28,6 @@
     "autoload": {
         "psr-4": {
             "tingyu\\WeixinTransfer\\": "src/"
-        },
-        "files": [
-            "src/common.php"
-        ]
+        }
     }
 }
