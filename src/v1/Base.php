@@ -3,6 +3,7 @@
 namespace tingyu\WeixinTransfer\v1;
 
 use tingyu\HttpRequest\HttpClient;
+use tingyu\WeixinTransfer\tool\NonceStr;
 
 abstract class Base
 {
@@ -103,7 +104,7 @@ abstract class Base
      */
     private function sign(&$data)
     {
-        $nonce = generate_nonce_string(32);
+        $nonce = (new NonceStr())->GenNonceStr(32);
         $data['nonce_str'] = $nonce;
 
         ksort($data);
