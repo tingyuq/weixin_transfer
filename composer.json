@@ -19,20 +19,15 @@
         "php": ">=7.0",
         "ext-curl": "*",
         "ext-json": "*",
-        "tingyu/http_request": "v0.0.4",
+        "tingyu/http_request": "v0.0.6",
         "ext-openssl": "*",
         "ext-mbstring": "*",
         "ext-simplexml": "*",
-        "ext-bcmath": "*",
-        "ext-sodium": "*",
-        "ext-libsodium": "*"
+        "ext-bcmath": "*"
     },
     "autoload": {
         "psr-4": {
             "tingyu\\WeixinTransfer\\": "src/"
-        },
-        "files": [
-            "src/common.php"
-        ]
+        }
     }
 }
